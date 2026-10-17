@@ -26,6 +26,7 @@ public class RhythmPlayer : MonoBehaviour
     [Tooltip("Given as percentage of a total beat (only effects the last dash)")]
     public float dashSize = 0.8f;
 
+
     // non-serialized //
 
     private GlobalRhythmManager m_manager;
@@ -34,6 +35,7 @@ public class RhythmPlayer : MonoBehaviour
 
     private List<GameObject> m_rhythmObjects;
 
+    private bool m_hitNextNote = false;
 
     // getters + setters //
 
@@ -50,6 +52,13 @@ public class RhythmPlayer : MonoBehaviour
         }
 
         return m_manager.bpm;
+    }
+
+    public char GetRhythmAtBeat(int beat)
+    {
+        if(beat < 0 || beat >= rhythm.Length) return ' ';
+
+        return rhythm[beat];
     }
 
     /// <summary>
@@ -70,12 +79,18 @@ public class RhythmPlayer : MonoBehaviour
         {
             int currentBeatInt = Mathf.FloorToInt(t_rightBound);
 
-            if(currentBeatInt < 0 || currentBeatInt >= rhythm.Length) return ' ';
-
-            return rhythm[currentBeatInt];
+            return GetRhythmAtBeat(currentBeatInt);
         }
 
         return ' ';
+    }
+
+    public void MarkGotNextNote()
+    {
+        // check if we should play sound now
+        char currentRhythm = GetRhythmAtBeat(m_manager.GetCurrentBeatFloored());
+
+        m_hitNextNote = !PlayNote(currentRhythm);
     }
 
     // event listeners //
@@ -90,10 +105,43 @@ public class RhythmPlayer : MonoBehaviour
         BuildRhythmObjects(beatSize);
     }
 
+    private int m_lastBeat = -1;
+
     void Update()
     {
-        
+        char lastRhythm = GetRhythmAtBeat(m_lastBeat);
+
+        int currentBeat = m_manager.GetCurrentBeatFloored();
+
+        char currentRhythm = GetRhythmAtBeat(currentBeat);
+
+        if(currentBeat != m_lastBeat)
+        {
+            // consecutive dots still count for rhythm edge
+            if( (lastRhythm != currentRhythm) || (lastRhythm == '.' && currentRhythm == '.'))
+            {
+                OnRhythmEdge();
+            }
+        }
+
+        m_lastBeat = currentBeat;
     }
+
+    /// <summary>
+    /// Called when rhythm is changing from one thing to another
+    /// (consecutive dashes do not trigger this)
+    /// </summary>
+    void OnRhythmEdge()
+    {
+        if(!m_hitNextNote) return;
+
+        char currentRhythm = GetRhythmAtBeat(m_manager.GetCurrentBeatFloored());
+
+        PlayNote(currentRhythm);
+
+        m_hitNextNote = false;
+    }
+
 
     // state managers //
 
@@ -106,6 +154,22 @@ public class RhythmPlayer : MonoBehaviour
         lineParent.localPosition = new(pos, 0, 0);
     }
 
+    public bool PlayNote(char rhythm)
+    {
+        switch (rhythm)
+        {
+            case '.':
+                PlayDotNote();
+                return true;
+            case '-':
+                PlayDashNote();
+                return true;
+            case ' ':
+            default:
+                StopNote();
+                return false;
+        }
+    }
 
     public void PlayDotNote()
     {

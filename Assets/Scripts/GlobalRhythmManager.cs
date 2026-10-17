@@ -126,22 +126,22 @@ public class GlobalRhythmManager : MonoBehaviour
         {
             RhythmPlayer telegram = telegrams[i];
 
-            switch (telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y))
-            {
-                case '.':
-                    DEBUG_dot.SetActive(true);
-                    DEBUG_dash.SetActive(false);
-                    break;
-                case '-':
-                    DEBUG_dot.SetActive(false);
-                    DEBUG_dash.SetActive(true);
-                    break;
-                case ' ':
-                default:
-                    DEBUG_dot.SetActive(false);
-                    DEBUG_dash.SetActive(false);
-                    break;
-            }
+            // switch (telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y))
+            // {
+            //     case '.':
+            //         DEBUG_dot.SetActive(true);
+            //         DEBUG_dash.SetActive(false);
+            //         break;
+            //     case '-':
+            //         DEBUG_dot.SetActive(false);
+            //         DEBUG_dash.SetActive(true);
+            //         break;
+            //     case ' ':
+            //     default:
+            //         DEBUG_dot.SetActive(false);
+            //         DEBUG_dash.SetActive(false);
+            //         break;
+            // }
 
             int t_lane = i + 1;
 
@@ -155,12 +155,9 @@ public class GlobalRhythmManager : MonoBehaviour
                 // check if it's in range of a beat
                 char t_currentRhythm = telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y);
 
-                if(t_currentRhythm == '.')
+                if(t_currentRhythm != ' ')
                 {
-                    telegram.PlayDotNote();
-                } else if(t_currentRhythm == '-')
-                {
-                    telegram.PlayDashNote();
+                    telegram.MarkGotNextNote();
                 }
             }
         }
