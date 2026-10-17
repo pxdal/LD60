@@ -69,9 +69,12 @@ public class GlobalRhythmManager : MonoBehaviour
     {
         m_rhythmPlayer = GetComponent<AudioSource>();
 
-        foreach(RhythmPlayer telegram in telegrams)
+        for(int i = 0; i < telegrams.Count; i++)
         {
+            RhythmPlayer telegram = telegrams[i];
+
             telegram.SetRhythmManager(this);
+            telegram.SetLane(i+1);
         }
     }
 
@@ -91,7 +94,7 @@ public class GlobalRhythmManager : MonoBehaviour
 
         UpdateLinePositions();
 
-        CheckIfTapped();
+        // CheckIfTapped();
     }
 
     /// <summary>
@@ -120,48 +123,48 @@ public class GlobalRhythmManager : MonoBehaviour
     public GameObject DEBUG_dot;
     public GameObject DEBUG_dash;
 
-    void CheckIfTapped()
-    {
-        for(int i = 0; i < telegrams.Count; i++)
-        {
-            RhythmPlayer telegram = telegrams[i];
+    // void CheckIfTapped()
+    // {
+    //     for(int i = 0; i < telegrams.Count; i++)
+    //     {
+    //         RhythmPlayer telegram = telegrams[i];
 
-            // switch (telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y))
-            // {
-            //     case '.':
-            //         DEBUG_dot.SetActive(true);
-            //         DEBUG_dash.SetActive(false);
-            //         break;
-            //     case '-':
-            //         DEBUG_dot.SetActive(false);
-            //         DEBUG_dash.SetActive(true);
-            //         break;
-            //     case ' ':
-            //     default:
-            //         DEBUG_dot.SetActive(false);
-            //         DEBUG_dash.SetActive(false);
-            //         break;
-            // }
+    //         // switch (telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y))
+    //         // {
+    //         //     case '.':
+    //         //         DEBUG_dot.SetActive(true);
+    //         //         DEBUG_dash.SetActive(false);
+    //         //         break;
+    //         //     case '-':
+    //         //         DEBUG_dot.SetActive(false);
+    //         //         DEBUG_dash.SetActive(true);
+    //         //         break;
+    //         //     case ' ':
+    //         //     default:
+    //         //         DEBUG_dot.SetActive(false);
+    //         //         DEBUG_dash.SetActive(false);
+    //         //         break;
+    //         // }
 
-            int t_lane = i + 1;
+    //         int t_lane = i + 1;
 
-            bool t_isTapping = GameController.Instance.Tapper.IsTapping(t_lane);
+    //         bool t_isTapping = GameController.Instance.Tapper.IsTapping(t_lane);
 
-            if (t_isTapping)
-            {
-                // TODO: do vis FX and stuff
-                Debug.DrawLine(Vector3.right * t_lane, Vector3.up, Color.red);
+    //         if (t_isTapping)
+    //         {
+    //             // TODO: do vis FX and stuff
+    //             Debug.DrawLine(Vector3.right * t_lane, Vector3.up, Color.red);
 
-                // check if it's in range of a beat
-                char t_currentRhythm = telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y);
+    //             // check if it's in range of a beat
+    //             char t_currentRhythm = telegram.GetCurrentRhythm(tapToleranceRange.x, tapToleranceRange.y);
 
-                if(t_currentRhythm != ' ')
-                {
-                    telegram.MarkGotNextNote();
-                }
-            }
-        }
-    }
+    //             if(t_currentRhythm != ' ')
+    //             {
+    //                 telegram.MarkPlayerTapped();
+    //             }
+    //         }
+    //     }
+    // }
 
     // state managers //
 

@@ -351,7 +351,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5039536232437844915, guid: c3cabc6e51abea44ba2b8afd7a2e68a8, type: 3}
       propertyPath: rhythm
-      value: ...  .... . .  .
+      value: '.-- .-- ..  --.. '
       objectReference: {fileID: 0}
     - target: {fileID: 5039536232437844915, guid: c3cabc6e51abea44ba2b8afd7a2e68a8, type: 3}
       propertyPath: beatSize
@@ -365,6 +365,10 @@ PrefabInstance:
       propertyPath: dashSound
       value: 
       objectReference: {fileID: 8300000, guid: 0e0d9e5a36c4b8546b5275c4550b78c6, type: 3}
+    - target: {fileID: 5039536232437844915, guid: c3cabc6e51abea44ba2b8afd7a2e68a8, type: 3}
+      propertyPath: DEBUG_text
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 5230797803663408432, guid: c3cabc6e51abea44ba2b8afd7a2e68a8, type: 3}
       propertyPath: m_Name
       value: Telegram

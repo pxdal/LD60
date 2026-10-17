@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class RhythmPlayer : MonoBehaviour
@@ -23,7 +24,7 @@ public class RhythmPlayer : MonoBehaviour
 
     public float beatSize = 1f;
 
-    [Tooltip("Given as percentage of a total beat (only effects the last dash)")]
+    [Tooltip("Given as percentage of a total beat (only affects the last dash)")]
     public float dashSize = 0.8f;
 
 
@@ -35,13 +36,20 @@ public class RhythmPlayer : MonoBehaviour
 
     private List<GameObject> m_rhythmObjects;
 
-    private bool m_hitNextNote = false;
+    private int m_currentNote = 0;
+
+    private int m_lane = -1;
 
     // getters + setters //
 
     public void SetRhythmManager(GlobalRhythmManager manager)
     {
         m_manager = manager;
+    }
+
+    public void SetLane(int lane)
+    {
+        m_lane = lane;
     }
 
     public int GetBPM()
@@ -85,13 +93,6 @@ public class RhythmPlayer : MonoBehaviour
         return ' ';
     }
 
-    public void MarkGotNextNote()
-    {
-        // check if we should play sound now
-        char currentRhythm = GetRhythmAtBeat(m_manager.GetCurrentBeatFloored());
-
-        m_hitNextNote = !PlayNote(currentRhythm);
-    }
 
     // event listeners //
 
@@ -105,42 +106,70 @@ public class RhythmPlayer : MonoBehaviour
         BuildRhythmObjects(beatSize);
     }
 
-    private int m_lastBeat = -1;
+    // private int m_lastBeat = -1;
+
+    private bool m_playerConsumedLastNote = false;
+    private bool m_handledAfterTapWindow = false;
 
     void Update()
     {
-        char lastRhythm = GetRhythmAtBeat(m_lastBeat);
+        bool playerTapping = GameController.Instance.Tapper.IsTapping(m_lane);
 
-        int currentBeat = m_manager.GetCurrentBeatFloored();
-
-        char currentRhythm = GetRhythmAtBeat(currentBeat);
-
-        if(currentBeat != m_lastBeat)
+        if(m_manager.GetCurrentBeatFloored() >= 0)
         {
-            // consecutive dots still count for rhythm edge
-            if( (lastRhythm != currentRhythm) || (lastRhythm == '.' && currentRhythm == '.'))
+            if (IsInTapWindow())
             {
-                OnRhythmEdge();
+                if (playerTapping && !m_playerConsumedLastNote)
+                {
+                    // consume note and play
+                    char t_curRhythm = rhythm[m_currentNote];
+
+                    PlayNote(t_curRhythm);
+
+                    m_currentNote++;
+                    m_playerConsumedLastNote = true;
+                }
+                
+                m_handledAfterTapWindow = false;
+            } else
+            {
+                if (!m_playerConsumedLastNote && !m_handledAfterTapWindow)
+                {
+                    // consume last note without playing
+                    m_currentNote++;
+                }
+
+                m_handledAfterTapWindow = true;
+                m_playerConsumedLastNote = false;
             }
         }
 
-        m_lastBeat = currentBeat;
+        // char lastRhythm = GetRhythmAtBeat(m_lastBeat);
+
+        // int currentBeat = m_manager.GetCurrentBeatFloored();
+
+        // char currentRhythm = GetRhythmAtBeat(currentBeat);
+
+        // if(currentBeat != m_lastBeat)
+        // {
+        //     // consecutive dots still count for rhythm edge
+        //     if( (lastRhythm != currentRhythm) || (lastRhythm == '.' && currentRhythm == '.'))
+        //     {
+        //         OnRhythmEdge();
+        //     }
+        // }
+
+        // m_lastBeat = currentBeat;
     }
 
-    /// <summary>
-    /// Called when rhythm is changing from one thing to another
-    /// (consecutive dashes do not trigger this)
-    /// </summary>
-    void OnRhythmEdge()
-    {
-        if(!m_hitNextNote) return;
-
-        char currentRhythm = GetRhythmAtBeat(m_manager.GetCurrentBeatFloored());
-
-        PlayNote(currentRhythm);
-
-        m_hitNextNote = false;
-    }
+    // /// <summary>
+    // /// Called when rhythm is changing from one thing to another
+    // /// (consecutive dashes do not trigger this)
+    // /// </summary>
+    // void OnRhythmEdge()
+    // {
+        
+    // }
 
 
     // state managers //
@@ -192,6 +221,17 @@ public class RhythmPlayer : MonoBehaviour
 
 
     // utils //
+
+    public bool IsInTapWindow()
+    {
+        float currentBeat = m_manager.GetCurrentBeat();
+
+        float t_leftBound = currentBeat + m_manager.tapToleranceRange.x;
+        float t_rightBound = currentBeat + m_manager.tapToleranceRange.y;
+
+        // detect if there's a beat change between
+        return Mathf.FloorToInt(t_leftBound) != Mathf.FloorToInt(t_rightBound);
+    }
 
     /// <summary>
     /// NOTE: negates value so that scrolling goes left
