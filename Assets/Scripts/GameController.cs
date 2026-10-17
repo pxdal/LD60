@@ -4,9 +4,9 @@ public class GameController : MonoBehaviour
 {
     // singleton stuff //
 
-    public static GameController m_instance = null;
+    private static GameController m_instance = null;
 
-    public GameController Instance
+    public static GameController Instance
     {
         get
         {
@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
     {
         get
         {
-            if(m_tapper == null) m_tapper = GetComponent<TapperBehaviour>();
+            if(m_tapper == null) m_tapper = GetComponentInChildren<TapperBehaviour>();
 
             return m_tapper;
         }

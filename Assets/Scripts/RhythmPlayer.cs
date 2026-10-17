@@ -16,6 +16,9 @@ public class RhythmPlayer : MonoBehaviour
 
     public GameObject dashPrefab;
 
+    public AudioClip dotSound;
+    public AudioClip dashSound;
+
     [Header("Settings")]
 
     public float beatSize = 1f;
@@ -26,6 +29,8 @@ public class RhythmPlayer : MonoBehaviour
     // non-serialized //
 
     private GlobalRhythmManager m_manager;
+
+    private AudioSource m_notePlayer;
 
     private List<GameObject> m_rhythmObjects;
 
@@ -47,8 +52,38 @@ public class RhythmPlayer : MonoBehaviour
         return m_manager.bpm;
     }
 
+    /// <summary>
+    /// leftBound and rightBound should be provided as fractions of a beat
+    /// </summary>
+    /// <param name="leftBound"></param>
+    /// <param name="rightBound"></param>
+    /// <returns></returns>
+    public char GetCurrentRhythm(float leftBound, float rightBound)
+    {
+        float currentBeat = m_manager.GetCurrentBeat();
+
+        float t_leftBound = currentBeat + leftBound;
+        float t_rightBound = currentBeat + rightBound;
+
+        // detect if there's a beat change between
+        if(Mathf.FloorToInt(t_leftBound) != Mathf.FloorToInt(t_rightBound))
+        {
+            int currentBeatInt = Mathf.FloorToInt(t_rightBound);
+
+            if(currentBeatInt < 0 || currentBeatInt >= rhythm.Length) return ' ';
+
+            return rhythm[currentBeatInt];
+        }
+
+        return ' ';
+    }
 
     // event listeners //
+
+    void Awake()
+    {
+        m_notePlayer = GetComponent<AudioSource>();
+    }
 
     void Start()
     {
@@ -59,6 +94,38 @@ public class RhythmPlayer : MonoBehaviour
     {
         
     }
+
+    // state managers //
+
+    public void SetLinePosition(float seconds)
+    {
+        float beats = RhythmUtils.SecondsToBeats(seconds, GetBPM());
+
+        float pos = PositionFromBeat(beats);
+
+        lineParent.localPosition = new(pos, 0, 0);
+    }
+
+
+    public void PlayDotNote()
+    {
+        m_notePlayer.clip = dotSound;
+
+        m_notePlayer.Play();
+    }
+
+    public void PlayDashNote()
+    {
+        m_notePlayer.clip = dashSound;
+
+        m_notePlayer.Play();
+    }
+
+    public void StopNote()
+    {
+        m_notePlayer.Stop();
+    }
+
 
     // utils //
 
@@ -71,16 +138,6 @@ public class RhythmPlayer : MonoBehaviour
     {
         return -beat * beatSize;
     }
-
-    public void SetLinePosition(float seconds)
-    {
-        float beats = RhythmUtils.SecondsToBeats(seconds, GetBPM());
-
-        float pos = PositionFromBeat(beats);
-
-        lineParent.localPosition = new(pos, 0, 0);
-    }
-
 
     void BuildRhythmObjects(float beatSpacing, float xOffset = 0)
     {
@@ -118,6 +175,8 @@ public class RhythmPlayer : MonoBehaviour
 
                     float t_dashSize = currentX - dashStart - beatSpacing*(1-dashSize);
                     t_dash.transform.localScale = new(t_dashSize, 1, 1);
+                    
+                    m_rhythmObjects.Add(t_dash);
 
                     buildingDash = false;
                 }
@@ -127,6 +186,8 @@ public class RhythmPlayer : MonoBehaviour
                     GameObject t_dot = Instantiate(dotPrefab, lineParent);
 
                     t_dot.transform.localPosition = currentPosition;
+
+                    m_rhythmObjects.Add(t_dot);
                 }
             }
 

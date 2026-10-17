@@ -8,4 +8,11 @@ public class RhythmUtils
 
         return bpm * minutes;
     }
+
+    public static float BeatsToSeconds(float beats, int bpm)
+    {
+        float minutes = beats / bpm;
+
+        return minutes * 60f;
+    }
 }
