@@ -3,11 +3,30 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+
+public class Note
+{
+    public char note;
+
+    public int durationBeats;
+
+    public int durationRemaining;
+
+    public bool startedPlaying = false;
+
+    public Note(char note, int durationBeats)
+    {
+        this.note = note;
+        this.durationBeats = durationBeats;
+        durationRemaining = durationBeats;
+    }
+}
+
 public class RhythmPlayer : MonoBehaviour
 {
     // serialized //
 
-    public string rhythm;
+    public string rhythmString;
 
     [Header("Objects/Prefabs")]
 
@@ -34,17 +53,28 @@ public class RhythmPlayer : MonoBehaviour
 
     private AudioSource m_notePlayer;
 
-    private List<GameObject> m_rhythmObjects;
+    private List<Note> m_parsedRhythm;
 
-    private int m_currentNote = 0;
+    private List<GameObject> m_rhythmObjects;
 
     private int m_lane = -1;
 
+    private bool m_playerTappedInWindow = false;
+
     // getters + setters //
+
+    public Note GetCurrentNote()
+    {
+        if(m_currentNote < 0 || m_currentNote >= m_parsedRhythm.Count) return null;
+
+        return m_parsedRhythm[m_currentNote];
+    }
 
     public void SetRhythmManager(GlobalRhythmManager manager)
     {
         m_manager = manager;
+
+        m_manager.onBeat.AddListener(OnBeat);
     }
 
     public void SetLane(int lane)
@@ -64,9 +94,9 @@ public class RhythmPlayer : MonoBehaviour
 
     public char GetRhythmAtBeat(int beat)
     {
-        if(beat < 0 || beat >= rhythm.Length) return ' ';
+        if(beat < 0 || beat >= rhythmString.Length) return ' ';
 
-        return rhythm[beat];
+        return rhythmString[beat];
     }
 
     /// <summary>
@@ -103,74 +133,96 @@ public class RhythmPlayer : MonoBehaviour
 
     void Start()
     {
+        ParseRhythm();
         BuildRhythmObjects(beatSize);
     }
 
-    // private int m_lastBeat = -1;
 
-    private bool m_playerConsumedLastNote = false;
-    private bool m_handledAfterTapWindow = false;
+    private int m_currentNote = 0;
+
+    public TMP_Text DEBUG_text;
 
     void Update()
     {
+        DEBUG_text.text = m_currentNote + "";
+
         bool playerTapping = GameController.Instance.Tapper.IsTapping(m_lane);
+        bool playerHolding = GameController.Instance.Tapper.IsHolding(m_lane);
 
-        if(m_manager.GetCurrentBeatFloored() >= 0)
+        if (IsInTapWindow(out float offsetToBeat))
         {
-            if (IsInTapWindow())
-            {
-                if (playerTapping && !m_playerConsumedLastNote)
-                {
-                    // consume note and play
-                    char t_curRhythm = rhythm[m_currentNote];
+            // DEBUG_text.text = "in tap window (playerTappedInWindow? " + m_playerTappedInWindow + ")";
 
-                    PlayNote(t_curRhythm);
-
-                    m_currentNote++;
-                    m_playerConsumedLastNote = true;
-                }
-                
-                m_handledAfterTapWindow = false;
-            } else
-            {
-                if (!m_playerConsumedLastNote && !m_handledAfterTapWindow)
+            if(playerTapping){
+                if(offsetToBeat > 0 && !m_playerTappedInWindow)
                 {
-                    // consume last note without playing
-                    m_currentNote++;
+                    PlayCurrentNote();
                 }
 
-                m_handledAfterTapWindow = true;
-                m_playerConsumedLastNote = false;
+                m_playerTappedInWindow = true;
             }
+        } else
+        {
+            // DEBUG_text.text = "not tap window";
+
+            m_playerTappedInWindow = false;
         }
-
-        // char lastRhythm = GetRhythmAtBeat(m_lastBeat);
-
-        // int currentBeat = m_manager.GetCurrentBeatFloored();
-
-        // char currentRhythm = GetRhythmAtBeat(currentBeat);
-
-        // if(currentBeat != m_lastBeat)
-        // {
-        //     // consecutive dots still count for rhythm edge
-        //     if( (lastRhythm != currentRhythm) || (lastRhythm == '.' && currentRhythm == '.'))
-        //     {
-        //         OnRhythmEdge();
-        //     }
-        // }
-
-        // m_lastBeat = currentBeat;
     }
 
-    // /// <summary>
-    // /// Called when rhythm is changing from one thing to another
-    // /// (consecutive dashes do not trigger this)
-    // /// </summary>
-    // void OnRhythmEdge()
-    // {
-        
-    // }
+    void OnBeat()
+    {
+        CheckCurrentNote();
+    }
 
+    void CheckCurrentNote()
+    {
+        Note t_note = GetCurrentNote();
+
+        if(t_note == null) return;
+
+        if (!t_note.startedPlaying)
+        {
+            if(m_playerTappedInWindow){
+                if(t_note.note == '.')
+                {
+                    PlayDotNote();
+                } else if(t_note.note == '-')
+                {
+                    PlayDashNote();
+                }
+            }
+            
+            t_note.startedPlaying = true;
+        } else if(t_note.durationRemaining > 0)
+        {
+            t_note.durationRemaining--;
+        }
+
+        if(t_note.durationRemaining <= 0){
+            // stop
+            StopNote();
+
+            m_currentNote++;
+
+            // run again to check for next note
+            CheckCurrentNote();
+        }
+    }
+
+    void PlayCurrentNote()
+    {
+        Note t_note = m_parsedRhythm[m_currentNote];
+
+        if(t_note.note == '.')
+        {
+            PlayDotNote();
+        } else if(t_note.note == '-')
+        {
+            PlayDashNote();
+        }
+
+        t_note.startedPlaying = true;
+    }
 
     // state managers //
 
@@ -222,7 +274,7 @@ public class RhythmPlayer : MonoBehaviour
 
     // utils //
 
-    public bool IsInTapWindow()
+    public bool IsInTapWindow(out float offsetToBeat)
     {
         float currentBeat = m_manager.GetCurrentBeat();
 
@@ -230,7 +282,11 @@ public class RhythmPlayer : MonoBehaviour
         float t_rightBound = currentBeat + m_manager.tapToleranceRange.y;
 
         // detect if there's a beat change between
-        return Mathf.FloorToInt(t_leftBound) != Mathf.FloorToInt(t_rightBound);
+        bool inTapWindow = Mathf.FloorToInt(t_leftBound) != Mathf.FloorToInt(t_rightBound);
+
+        offsetToBeat = currentBeat - Mathf.FloorToInt(t_rightBound);
+
+        return inTapWindow;
     }
 
     /// <summary>
@@ -243,9 +299,42 @@ public class RhythmPlayer : MonoBehaviour
         return -beat * beatSize;
     }
 
+    void ParseRhythm()
+    {
+        m_parsedRhythm = new();
+
+        int dashDuration = 0;
+
+        for(int i = 0; i < rhythmString.Length; i++)
+        {
+            char r = rhythmString[i];
+
+            if(r != '-')
+            {
+                if(dashDuration > 0)
+                {
+                    m_parsedRhythm.Add(new('-', dashDuration));    
+                    dashDuration = 0;
+                }
+
+                m_parsedRhythm.Add(new(r, 1));
+            } else
+            {
+                dashDuration++;
+            }
+        }
+
+        if(dashDuration > 0)
+        {
+            m_parsedRhythm.Add(new('-', dashDuration));
+        }
+    }
+
+    // NOTE: it would be more sensible to implement this using the notes and durations from
+    // ParseRhythm, but I wrote this first and don't feel like changing it now.
     void BuildRhythmObjects(float beatSpacing, float xOffset = 0)
     {
-        if(rhythm.Length < 1) return;
+        if(rhythmString.Length < 1) return;
 
         m_rhythmObjects = new();
 
@@ -254,9 +343,9 @@ public class RhythmPlayer : MonoBehaviour
         bool buildingDash = false;
         float dashStart = -1f;
 
-        for(int i = 0; i < rhythm.Length+1; i++)
+        for(int i = 0; i < rhythmString.Length+1; i++)
         {
-            char c = i == rhythm.Length ? ' ' : rhythm[i];
+            char c = i == rhythmString.Length ? ' ' : rhythmString[i];
 
             Vector3 currentPosition = new(currentX, 0);
             
