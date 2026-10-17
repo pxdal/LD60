@@ -6,6 +6,8 @@ public class RhythmPlayer : MonoBehaviour
 {
     // serialized //
 
+    public string rhythm;
+
     [Header("Objects/Prefabs")]
 
     public Transform lineParent;
@@ -23,19 +25,33 @@ public class RhythmPlayer : MonoBehaviour
 
     // non-serialized //
 
-    [NonSerialized] public string rhythm;
-
+    private GlobalRhythmManager m_manager;
 
     private List<GameObject> m_rhythmObjects;
+
+
+    // getters + setters //
+
+    public void SetRhythmManager(GlobalRhythmManager manager)
+    {
+        m_manager = manager;
+    }
+
+    public int GetBPM()
+    {
+        if(m_manager == null)
+        {
+            throw new Exception("manager not assigned!");
+        }
+
+        return m_manager.bpm;
+    }
 
 
     // event listeners //
 
     void Start()
     {
-        // TEMP: assign rhythm
-        rhythm = Rhythms.TEST_LEVEL;
-
         BuildRhythmObjects(beatSize);
     }
 
@@ -45,6 +61,26 @@ public class RhythmPlayer : MonoBehaviour
     }
 
     // utils //
+
+    /// <summary>
+    /// NOTE: negates value so that scrolling goes left
+    /// </summary>
+    /// <param name="beat"></param>
+    /// <returns></returns>
+    public float PositionFromBeat(float beat)
+    {
+        return -beat * beatSize;
+    }
+
+    public void SetLinePosition(float seconds)
+    {
+        float beats = RhythmUtils.SecondsToBeats(seconds, GetBPM());
+
+        float pos = PositionFromBeat(beats);
+
+        lineParent.localPosition = new(pos, 0, 0);
+    }
+
 
     void BuildRhythmObjects(float beatSpacing, float xOffset = 0)
     {
