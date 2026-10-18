@@ -23,6 +23,7 @@ public class RhythmPlayer : MonoBehaviour
 
     public AudioSource errorSound;
 
+
     [Header("Settings")]
 
     public float beatSize = 1f;
@@ -48,6 +49,11 @@ public class RhythmPlayer : MonoBehaviour
     public int GetNotesMissedCount()
     {
         return m_misses;
+    }
+
+    public void ResetMisses()
+    {
+        m_misses = 0;
     }
 
     public void SetRhythmManager(GlobalRhythmManager manager)
@@ -121,6 +127,7 @@ public class RhythmPlayer : MonoBehaviour
                 if (!m_lastNote.hitByPlayer)
                 {
                     StopNote();
+                    errorSound.Play();
 
                     m_lastNote.missed = true;
                     m_misses++;

@@ -44,10 +44,10 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: cee77f143ca613c498ffcf31a462bb71, type: 3}
+  m_Resource: {fileID: 8300000, guid: b48f8932654b49042b2a288ec75d69fc, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0.128
-  m_Pitch: 3
+  m_Pitch: 1
   Loop: 0
   Mute: 0
   Spatialize: 0
@@ -276,7 +276,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 10, y: 1.5}
+  m_Size: {x: 15, y: 1.5}
   m_EdgeRadius: 0
 --- !u!1 &5142891245115641219
 GameObject:

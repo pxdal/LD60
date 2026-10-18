@@ -1,5 +1,5 @@
-using UnityEditor.EditorTools;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class MissedMeter : MonoBehaviour
 {
@@ -20,18 +20,25 @@ public class MissedMeter : MonoBehaviour
     [Tooltip("Delta-corrected")]
     public float lerpRate = 0.01f;
 
+    public UnityEvent onFail = new();
+
     // private //
 
     private int m_currentMisses = 0;
 
     public void AddMiss()
     {
-        m_currentMisses += 1;
+        SetMisses(m_currentMisses + 1);        
     }
 
     public void SetMisses(int misses)
     {
         m_currentMisses = misses;
+
+        if(m_currentMisses >= maxMisses)
+        {
+            onFail.Invoke();
+        }
     }
 
     private float m_currentFractionalProgress = 0f;
@@ -39,7 +46,7 @@ public class MissedMeter : MonoBehaviour
 	void Update()
 	{
         Debug.Log(m_currentMisses);
-        
+
 		// lerp fractional progress
         m_currentFractionalProgress = Mathf.Lerp(m_currentFractionalProgress, m_currentMisses, lerpRate * Time.deltaTime);
 

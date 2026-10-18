@@ -146,4 +146,28 @@ public class GlobalRhythmManager : MonoBehaviour
             telegram.PlayScheduled(startTime);
         }
     }
+
+    public void Stop()
+    {
+        m_rhythmPlayer.Stop();
+
+        foreach(RhythmPlayer telegram in telegrams)
+        {
+            telegram.StopNote();
+        }    
+    }
+
+    public void Reset()
+    {
+        foreach(RhythmPlayer telegram in telegrams)
+        {
+            telegram.ResetMisses();    
+        }
+
+        missedMeter.SetMisses(0);
+
+        m_rhythmPlayer.Stop();
+
+        Play(1f);
+    }
 }
