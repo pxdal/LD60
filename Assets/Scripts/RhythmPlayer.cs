@@ -41,12 +41,13 @@ public class RhythmPlayer : MonoBehaviour
 
     private int m_lane = -1;
 
+    private int m_misses = 0;
 
     // getters + setters //
 
     public int GetNotesMissedCount()
     {
-        return m_rhythmObjects.Sum(n => n.missed ? 1 : 0);
+        return m_misses;
     }
 
     public void SetRhythmManager(GlobalRhythmManager manager)
@@ -104,6 +105,7 @@ public class RhythmPlayer : MonoBehaviour
             {
                 StopNote();
                 errorSound.Play();
+                m_misses++;
             } else
             {
                 currentNote.hitByPlayer = true;
@@ -120,7 +122,8 @@ public class RhythmPlayer : MonoBehaviour
                 {
                     StopNote();
 
-                    Debug.Log("missed note");
+                    m_lastNote.missed = true;
+                    m_misses++;
                 }
             }
         }

@@ -6,6 +6,9 @@ public class GlobalRhythmManager : MonoBehaviour
 {
     // public //
 
+    [Header("External Objects")]
+    public MissedMeter missedMeter;
+
     [Header("Play Settings")]
 
     public int bpm;
@@ -60,6 +63,17 @@ public class GlobalRhythmManager : MonoBehaviour
         return Mathf.RoundToInt(m_currentBeat);
     }
 
+    public int GetNumMisses()
+    {
+        int sum = 0;
+
+        foreach(RhythmPlayer telegram in telegrams)
+        {
+            sum += telegram.GetNotesMissedCount();
+        }
+
+        return sum;
+    }
 
     // event listeners //
 
@@ -92,6 +106,7 @@ public class GlobalRhythmManager : MonoBehaviour
 
         UpdateLinePositions();
 
+        missedMeter.SetMisses(GetNumMisses());
         // CheckIfTapped();
     }
 
