@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 
 
@@ -23,6 +21,10 @@ public class RhythmPlayer : MonoBehaviour
 
     public AudioSource errorSound;
 
+    public SpriteRenderer telegraphSprite;
+
+    public Sprite telegraphNormal;
+    public Sprite telegraphPressed;
 
     [Header("Settings")]
 
@@ -104,6 +106,15 @@ public class RhythmPlayer : MonoBehaviour
         NoteBehaviour currentNote = GetOverlappingNote();
 
         bool playerTapping = GameController.Instance.Tapper.IsTapping(m_lane);
+        bool playerHolding = GameController.Instance.Tapper.IsHolding(m_lane);
+
+        if (playerHolding)
+        {
+            telegraphSprite.sprite = telegraphPressed;
+        } else
+        {
+            telegraphSprite.sprite = telegraphNormal;
+        }
 
         if (playerTapping)
         {
