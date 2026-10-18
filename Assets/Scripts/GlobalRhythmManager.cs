@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,6 +9,8 @@ public class GlobalRhythmManager : MonoBehaviour
 
     [Header("External Objects")]
     public MissedMeter missedMeter;
+
+    public TMP_Text notesMissedText;
 
     [Header("Play Settings")]
 
@@ -25,6 +28,8 @@ public class GlobalRhythmManager : MonoBehaviour
     [Header("Other")]
 
     public UnityEvent onBeat = new();
+
+    public UnityEvent onEnd = new();
 
     // private //
 
@@ -95,8 +100,12 @@ public class GlobalRhythmManager : MonoBehaviour
         m_rhythmPlayer.clip = rhythmClip;
         m_rhythmPlayer.loop = false;
 
+        onEnd.AddListener(OnEnd);
+
         Play(1f);
     }
+
+    private bool m_wasStopped = false;
 
     void Update()
     {
@@ -108,6 +117,16 @@ public class GlobalRhythmManager : MonoBehaviour
 
         missedMeter.SetMisses(GetNumMisses());
         // CheckIfTapped();
+
+        if(m_rhythmPlayer.time > m_rhythmPlayer.clip.length-0.1f && !m_wasStopped)
+        {
+            onEnd.Invoke();
+        }
+    }
+
+    void OnEnd()
+    {
+        notesMissedText.text = "Missed: " + GetNumMisses();
     }
 
     /// <summary>
@@ -149,6 +168,8 @@ public class GlobalRhythmManager : MonoBehaviour
 
     public void Stop()
     {
+        m_wasStopped = true;
+
         m_rhythmPlayer.Stop();
 
         foreach(RhythmPlayer telegram in telegrams)
@@ -159,6 +180,8 @@ public class GlobalRhythmManager : MonoBehaviour
 
     public void Reset()
     {
+        m_wasStopped = false;
+
         foreach(RhythmPlayer telegram in telegrams)
         {
             telegram.ResetMisses();    

@@ -392,7 +392,7 @@ SpriteRenderer:
   m_SortingOrder: 2
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
+  m_Color: {r: 0.122641504, g: 0.122641504, b: 0.122641504, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -491,7 +491,11 @@ MonoBehaviour:
   telegraphSprite: {fileID: 7495300228317060670}
   telegraphNormal: {fileID: 21300000, guid: 73b7a1797021e1841b63da0c51445651, type: 3}
   telegraphPressed: {fileID: 21300000, guid: 6305ec17bb35464409010aa25772d0eb, type: 3}
-  beatSize: 6
+  paperStart: {fileID: 5593452785422353447, guid: 956ed4e34b0d0774588d99235aff5695, type: 3}
+  paperLoop: {fileID: 4457931253346440380, guid: bc16b11c46bcd864eb19a503817dad54, type: 3}
+  paperEnd: {fileID: 7209635215130191436, guid: eb1fed40af6189c47bcf43fd2d72de46, type: 3}
+  paperSpacing: 13
+  beatSize: 4
   dashSize: 0.5
 --- !u!82 &2284724988412726005
 AudioSource:

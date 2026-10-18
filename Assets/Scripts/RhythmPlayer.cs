@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using UnityEngine;
 
 
@@ -26,6 +27,12 @@ public class RhythmPlayer : MonoBehaviour
     public Sprite telegraphNormal;
     public Sprite telegraphPressed;
 
+    public GameObject paperStart;
+    public GameObject paperLoop;
+    public GameObject paperEnd;
+
+    public float paperSpacing = 10f;
+
     [Header("Settings")]
 
     public float beatSize = 1f;
@@ -45,6 +52,7 @@ public class RhythmPlayer : MonoBehaviour
     private int m_lane = -1;
 
     private int m_misses = 0;
+
 
     // getters + setters //
 
@@ -122,7 +130,7 @@ public class RhythmPlayer : MonoBehaviour
             {
                 StopNote();
                 errorSound.Play();
-                m_misses++;
+                // m_misses++;
             } else
             {
                 currentNote.hitByPlayer = true;
@@ -209,6 +217,43 @@ public class RhythmPlayer : MonoBehaviour
         bool buildingDash = false;
         float dashStart = -1f;
 
+        float t_lastPaper = 0f;
+
+        // add paper
+        for(int i = 0; i < rhythmString.Length; i++)
+        {
+            // skip first four beats
+            if(i < 6){
+            } else if(i == 6)
+            {
+                GameObject t_paperStart = Instantiate(paperStart, lineParent);
+
+                t_paperStart.transform.localPosition = new Vector3(currentX, 0, 0);
+
+                // TODO: gross hardcoding
+                t_paperStart.transform.localScale = new Vector3(4, 4, 4);
+
+                t_lastPaper = currentX;
+            } else
+            {
+                if(currentX - t_lastPaper > paperSpacing)
+                {
+                    GameObject t_paperLoop = Instantiate(paperLoop, lineParent);
+
+                    t_paperLoop.transform.localPosition = new Vector3(currentX, 0, 0);
+                    // TODO: gross hardcoding
+                    t_paperLoop.transform.localScale = new Vector3(4, 4, 4);
+
+                    t_lastPaper = currentX;
+                }
+            }
+
+            currentX += beatSpacing;
+        }
+
+        currentX = xOffset;
+
+        // add notes
         for(int i = 0; i < rhythmString.Length+1; i++)
         {
             char c = i == rhythmString.Length ? ' ' : rhythmString[i];

@@ -45,8 +45,6 @@ public class MissedMeter : MonoBehaviour
 
 	void Update()
 	{
-        Debug.Log(m_currentMisses);
-
 		// lerp fractional progress
         m_currentFractionalProgress = Mathf.Lerp(m_currentFractionalProgress, m_currentMisses, lerpRate * Time.deltaTime);
 
