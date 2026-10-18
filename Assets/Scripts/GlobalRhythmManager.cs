@@ -81,7 +81,7 @@ public class GlobalRhythmManager : MonoBehaviour
         m_rhythmPlayer.clip = rhythmClip;
         m_rhythmPlayer.loop = false;
 
-        Play();
+        Play(1f);
     }
 
     void Update()
@@ -120,10 +120,15 @@ public class GlobalRhythmManager : MonoBehaviour
 
     // state managers //
 
-    public void Play()
+    public void Play(float delay)
     {
-        m_rhythmPlayer.Play();
+        float startTime = (float)AudioSettings.dspTime + delay;
 
-        onBeat.Invoke();
+        m_rhythmPlayer.PlayScheduled(startTime);
+
+        foreach(RhythmPlayer telegram in telegrams)
+        {
+            telegram.PlayScheduled(startTime);
+        }
     }
 }
