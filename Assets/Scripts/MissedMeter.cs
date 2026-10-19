@@ -51,6 +51,8 @@ public class MissedMeter : MonoBehaviour
         // set scale and such appropriately
         float percent = m_currentFractionalProgress / maxMisses;
 
+        percent = Mathf.Min(1, percent);
+
         Color c = Color.Lerp(baseColor, badColor, percent);
 
         m_innerScale.localScale = new(m_innerScale.localScale.x, percent, m_innerScale.localScale.z);

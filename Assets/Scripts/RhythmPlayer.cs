@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 public class RhythmPlayer : MonoBehaviour
@@ -22,11 +23,6 @@ public class RhythmPlayer : MonoBehaviour
 
     public AudioSource errorSound;
 
-    public SpriteRenderer telegraphSprite;
-
-    public Sprite telegraphNormal;
-    public Sprite telegraphPressed;
-
     public GameObject paperStart;
     public GameObject paperLoop;
     public GameObject paperEnd;
@@ -40,6 +36,9 @@ public class RhythmPlayer : MonoBehaviour
     [Tooltip("Given as percentage of a total beat (only affects the last dash)")]
     public float dashSize = 0.8f;
 
+    public UnityEvent whileHolding;
+
+    public UnityEvent whileReleased;
 
     // non-serialized //
 
@@ -118,10 +117,10 @@ public class RhythmPlayer : MonoBehaviour
 
         if (playerHolding)
         {
-            telegraphSprite.sprite = telegraphPressed;
+            whileHolding.Invoke();
         } else
         {
-            telegraphSprite.sprite = telegraphNormal;
+            whileReleased.Invoke();
         }
 
         if (playerTapping)
