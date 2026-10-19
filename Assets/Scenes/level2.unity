@@ -312,7 +312,7 @@ MonoBehaviour:
   onFail:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1540886433}
         m_TargetAssemblyTypeName: GlobalRhythmManager, Assembly-CSharp
         m_MethodName: Stop
         m_Mode: 1

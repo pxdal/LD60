@@ -164,6 +164,13 @@ public class RhythmPlayer : MonoBehaviour
 
                     m_misses++;
                 }
+
+                // was that the last note?  disable missing on blank if so
+                // (lets the player spam it)
+                if(m_rhythmObjects.IndexOf(m_lastNote) == m_rhythmObjects.Count - 1)
+                {
+                    m_canMissOnBlank = false;
+                }
             }
         } else
         {
