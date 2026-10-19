@@ -357,6 +357,10 @@ PrefabInstance:
       value: Global Rhythm Manager (1)
       objectReference: {fileID: 0}
     - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
+      propertyPath: bg
+      value: 
+      objectReference: {fileID: 1515990652}
+    - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
       propertyPath: bpm
       value: 360
       objectReference: {fileID: 0}
@@ -372,6 +376,14 @@ PrefabInstance:
       propertyPath: notesMissedText
       value: 
       objectReference: {fileID: 1550478052}
+    - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
+      propertyPath: playingBgOpacity
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
+      propertyPath: onEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 565116366}
     - target: {fileID: 9090451539116902074, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4
@@ -669,7 +681,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

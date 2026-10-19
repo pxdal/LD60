@@ -12,6 +12,8 @@ public class GlobalRhythmManager : MonoBehaviour
 
     public TMP_Text notesMissedText;
 
+    public GameObject bg;
+
     [Header("Play Settings")]
 
     public int bpm;
@@ -30,30 +32,40 @@ public class GlobalRhythmManager : MonoBehaviour
 
     [Header("Other")]
 
+    public float normalBgOpacity = 1f;
+
+    public float playingBgOpacity = 0.75f;
+
+    public float bgFadeDuration = 1f;
+
     public UnityEvent onBeat = new();
 
     public UnityEvent onEnd = new();
 
     // private //
 
-    private AudioSource m_rhythmPlayer;
+    private AudioSource m_rhythmAudioSource;
 
 
     private float m_currentBeat = 0;
 
+    private float m_smoothedTimeOffset = -1f;
 
     // getters + setters //
 
     public bool IsPlaying()
     {
-        return m_rhythmPlayer.isPlaying;
+        return m_rhythmAudioSource.time > 0;
     }
 
     public float GetCurrentTime()
     {
         if(!IsPlaying()) return -1;
 
-        return m_rhythmPlayer.time;
+        // return m_rhythmAudioSource.time;
+
+        // smoother motion
+        return Time.time - m_smoothedTimeOffset;
     }
 
     public float GetCurrentBeat()
@@ -87,7 +99,7 @@ public class GlobalRhythmManager : MonoBehaviour
 
     void Awake()
     {
-        m_rhythmPlayer = GetComponent<AudioSource>();
+        m_rhythmAudioSource = GetComponent<AudioSource>();
 
         for(int i = 0; i < telegrams.Count; i++)
         {
@@ -100,8 +112,8 @@ public class GlobalRhythmManager : MonoBehaviour
 
     void Start()
     {
-        m_rhythmPlayer.clip = rhythmClip;
-        m_rhythmPlayer.loop = false;
+        m_rhythmAudioSource.clip = rhythmClip;
+        m_rhythmAudioSource.loop = false;
 
         onEnd.AddListener(OnEnd);
 
@@ -114,6 +126,14 @@ public class GlobalRhythmManager : MonoBehaviour
     {
         if(!IsPlaying()) return;
 
+        if(m_smoothedTimeOffset < 0f)
+        {
+            // first set of smooth time
+            float t_audioPosition = m_rhythmAudioSource.time;
+            
+            m_smoothedTimeOffset = Time.time - t_audioPosition;
+        }
+
         UpdateRhythm();
 
         UpdateLinePositions();
@@ -121,8 +141,10 @@ public class GlobalRhythmManager : MonoBehaviour
         missedMeter.SetMisses(GetNumMisses());
         // CheckIfTapped();
 
-        if(m_rhythmPlayer.time > m_rhythmPlayer.clip.length-0.1f && !m_wasStopped)
+        if(m_rhythmAudioSource.time > m_rhythmAudioSource.clip.length-0.1f && !m_wasStopped)
         {
+            FadeInBg(0f);
+
             onEnd.Invoke();
         }
     }
@@ -157,11 +179,23 @@ public class GlobalRhythmManager : MonoBehaviour
 
     // state managers //
 
+    public void FadeOutBg(float after)
+    {
+        StartCoroutine(bg.FadeObjectAfter(playingBgOpacity, bgFadeDuration, after));
+    }
+
+    public void FadeInBg(float after)
+    {
+        StartCoroutine(bg.FadeObjectAfter(normalBgOpacity, bgFadeDuration, after));
+    }
+
     public void Play(float delay)
     {
         float startTime = (float)AudioSettings.dspTime + delay;
 
-        m_rhythmPlayer.PlayScheduled(startTime);
+        m_rhythmAudioSource.PlayScheduled(startTime);
+
+        FadeOutBg(0f);
 
         foreach(RhythmPlayer telegram in telegrams)
         {
@@ -173,7 +207,7 @@ public class GlobalRhythmManager : MonoBehaviour
     {
         m_wasStopped = true;
 
-        m_rhythmPlayer.Stop();
+        m_rhythmAudioSource.Stop();
 
         foreach(RhythmPlayer telegram in telegrams)
         {
@@ -192,7 +226,7 @@ public class GlobalRhythmManager : MonoBehaviour
 
         missedMeter.SetMisses(0);
 
-        m_rhythmPlayer.Stop();
+        m_rhythmAudioSource.Stop();
 
         Play(1f);
     }

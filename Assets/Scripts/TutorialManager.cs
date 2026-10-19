@@ -24,14 +24,14 @@ public class TutorialManager : MonoBehaviour
     {
         if (GameController.Instance.Tapper.IsTapping1() && !m_tapped1)
         {
-            StartCoroutine(FadeObject(pressZ, 0f, fadeDuration, true));
+            StartCoroutine(pressZ.FadeObject(0f, fadeDuration, true));
 
             m_tapped1 = true;
         }
 
         if (GameController.Instance.Tapper.IsTapping2() && !m_tapped2)
         {
-            StartCoroutine(FadeObject(pressM, 0f, fadeDuration, true));
+            StartCoroutine(pressM.FadeObject(0f, fadeDuration, true));
 
             m_tapped2 = true;
         }
@@ -39,10 +39,10 @@ public class TutorialManager : MonoBehaviour
         if(m_tapped1 && m_tapped2 && !m_startedFinalFade)
         {
             // fade in when first fade is done
-            StartCoroutine(FadeObjectAfter(tapTheNotes, 1f, fadeDuration, fadeDuration, false));
+            StartCoroutine(tapTheNotes.FadeObjectAfter(1f, fadeDuration, fadeDuration, false));
 
             // fade out after fade in + hold time
-            StartCoroutine(FadeObjectAfter(tapTheNotes, 0f, fadeDuration, fadeDuration + tapTheNotesHoldTime, true));
+            StartCoroutine(tapTheNotes.FadeObjectAfter(0f, fadeDuration, fadeDuration + tapTheNotesHoldTime, true));
 
             // tutorial ends when the last fade starts
             StartCoroutine(TriggerEndAfter(fadeDuration + tapTheNotesHoldTime));
@@ -58,39 +58,5 @@ public class TutorialManager : MonoBehaviour
         onTutorialEnd.Invoke();    
     }
 
-    IEnumerator FadeObjectAfter(GameObject gobj, float destinationOpacity, float duration, float delay, bool deleteWhenDone = false)
-    {
-        yield return new WaitForSeconds(delay);
-
-        StartCoroutine(FadeObject(gobj, destinationOpacity, duration, deleteWhenDone));    
-    }
-
-    IEnumerator FadeObject(GameObject gobj, float destinationOpacity, float duration, bool deleteWhenDone = false)
-    {
-        SpriteRenderer sr = gobj.GetComponentInChildren<SpriteRenderer>();
-
-        float startOpacity = sr.color.a;
-        
-        float opacityPerSecond = (destinationOpacity - startOpacity) / duration;
-
-        float startTime = Time.time;
-
-        while(Time.time - startTime < duration)
-        {
-            float elapsed = Time.time - startTime;
-
-            float total = opacityPerSecond * elapsed;
-
-            sr.color = new(sr.color.r, sr.color.g, sr.color.b, startOpacity + total);
-
-            yield return null;
-        }
-
-        sr.color = new(sr.color.r, sr.color.g, sr.color.b, destinationOpacity);
-
-        if (deleteWhenDone)
-        {
-            Destroy(gobj);
-        }
-    }
+    
 }

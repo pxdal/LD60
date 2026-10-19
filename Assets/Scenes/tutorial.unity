@@ -1739,7 +1739,7 @@ Transform:
   m_GameObject: {fileID: 1324756504}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.48, y: -3.9, z: 0}
+  m_LocalPosition: {x: 0.3, y: -3.71, z: 0}
   m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -2617,7 +2617,7 @@ Transform:
   m_GameObject: {fileID: 1819930421}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.38099998, y: -1.9, z: 0}
+  m_LocalPosition: {x: 0.31, y: -1.91, z: 0}
   m_LocalScale: {x: 0.85, y: 0.85, z: 0.85}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -3056,6 +3056,10 @@ PrefabInstance:
       value: Global Rhythm Manager
       objectReference: {fileID: 0}
     - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
+      propertyPath: bg
+      value: 
+      objectReference: {fileID: 1515990652}
+    - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
       propertyPath: missedMeter
       value: 
       objectReference: {fileID: 242359132}
@@ -3063,6 +3067,10 @@ PrefabInstance:
       propertyPath: notesMissedText
       value: 
       objectReference: {fileID: 1550478052}
+    - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
+      propertyPath: playingBgOpacity
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 8395910891047346955, guid: d94ef1372f4d9e249bddc1e7db041cde, type: 3}
       propertyPath: onEnd.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
