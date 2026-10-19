@@ -217,11 +217,15 @@ public class GlobalRhythmManager : MonoBehaviour
 
     public void Reset()
     {
+        // NOTE: resets on next loop
+        m_smoothedTimeOffset = -1f;
+
         m_wasStopped = false;
 
         foreach(RhythmPlayer telegram in telegrams)
         {
-            telegram.Reset();    
+            telegram.Reset();
+            telegram.SetLinePosition(0f);  
         }
 
         missedMeter.SetMisses(0);

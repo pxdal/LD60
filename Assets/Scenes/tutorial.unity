@@ -397,7 +397,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MissedMeter
   m_innerScale: {fileID: 1494849718}
   m_innerScaleSprite: {fileID: 1742780642}
-  maxMisses: 10
+  maxMisses: 5
   baseColor: {r: 1, g: 1, b: 1, a: 1}
   badColor: {r: 1, g: 0, b: 0, a: 1}
   lerpRate: 20
