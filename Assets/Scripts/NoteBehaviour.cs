@@ -6,15 +6,38 @@ public class NoteBehaviour : MonoBehaviour
 
     public bool missed = false;
     
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    public SpriteRenderer spriteRenderer;
+    
+    public Color hitColor;
+
+    public Color missedColor;
+
+    private Color m_baseColor;
+
     void Start()
     {
-        
+        m_baseColor = spriteRenderer.color;    
     }
 
-    // Update is called once per frame
-    void Update()
+    public void MarkAsHit()
     {
-        
+        spriteRenderer.color = hitColor;
+
+        hitByPlayer = true;
+    }
+
+    public void MarkAsMissed()
+    {
+        spriteRenderer.color = missedColor;
+
+        missed = true;
+    }
+
+    public void Reset()
+    {
+        spriteRenderer.color = m_baseColor;
+
+        missed = false;
+        hitByPlayer = false;
     }
 }

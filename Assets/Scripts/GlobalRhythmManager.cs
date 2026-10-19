@@ -20,6 +20,9 @@ public class GlobalRhythmManager : MonoBehaviour
 
     public List<RhythmPlayer> telegrams = new();
 
+
+    public bool autostart = true;
+
     [Header("Tap Settings")]
 
     [Tooltip("The left and right bounds of the tolerance, defined in fractions of a beat")]
@@ -102,7 +105,7 @@ public class GlobalRhythmManager : MonoBehaviour
 
         onEnd.AddListener(OnEnd);
 
-        Play(1f);
+        if(autostart) Play(1f);
     }
 
     private bool m_wasStopped = false;
@@ -184,7 +187,7 @@ public class GlobalRhythmManager : MonoBehaviour
 
         foreach(RhythmPlayer telegram in telegrams)
         {
-            telegram.ResetMisses();    
+            telegram.Reset();    
         }
 
         missedMeter.SetMisses(0);

@@ -140,6 +140,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DotBehaviour
   hitByPlayer: 0
   missed: 0
+  spriteRenderer: {fileID: 2686611708639491599}
+  hitColor: {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 1}
+  missedColor: {r: 1, g: 0.3726415, b: 0.3726415, a: 1}
 --- !u!61 &991472903779837146
 BoxCollider2D:
   m_ObjectHideFlags: 0

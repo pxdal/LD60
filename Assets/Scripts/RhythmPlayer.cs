@@ -60,9 +60,15 @@ public class RhythmPlayer : MonoBehaviour
         return m_misses;
     }
 
-    public void ResetMisses()
+    public void Reset()
     {
         m_misses = 0;
+        m_canMissOnBlank = false;
+
+        foreach(NoteBehaviour note in m_rhythmObjects)
+        {
+            note.Reset();
+        }
     }
 
     public void SetRhythmManager(GlobalRhythmManager manager)
@@ -108,6 +114,9 @@ public class RhythmPlayer : MonoBehaviour
 
     private NoteBehaviour m_lastNote = null;
 
+    // not set to true until the first proper note plays
+    private bool m_canMissOnBlank = false;
+
     void Update()
     {
         NoteBehaviour currentNote = GetOverlappingNote();
@@ -129,10 +138,14 @@ public class RhythmPlayer : MonoBehaviour
             {
                 StopNote();
                 errorSound.Play();
-                // m_misses++;
+
+
+                if(m_canMissOnBlank){
+                    m_misses++;
+                }
             } else
             {
-                currentNote.hitByPlayer = true;
+                currentNote.MarkAsHit();
                 PlayNote();
             }
         }
@@ -147,10 +160,15 @@ public class RhythmPlayer : MonoBehaviour
                     StopNote();
                     errorSound.Play();
 
-                    m_lastNote.missed = true;
+                    m_lastNote.MarkAsMissed();
+
                     m_misses++;
                 }
             }
+        } else
+        {
+            // there are no blank notes, so as soon as we any note one mark this
+            m_canMissOnBlank = true;
         }
 
         m_lastNote = currentNote;
@@ -221,7 +239,7 @@ public class RhythmPlayer : MonoBehaviour
         // add paper
         for(int i = 0; i < rhythmString.Length; i++)
         {
-            // skip first four beats
+            // skip first six beats
             if(i < 6){
             } else if(i == 6)
             {
